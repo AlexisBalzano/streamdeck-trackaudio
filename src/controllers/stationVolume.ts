@@ -329,6 +329,15 @@ export class StationVolumeController extends BaseController {
   }
 
   /**
+   * Gets the title text for the dial. Only dynamic dials set one, since a fixed
+   * dial keeps whatever title the user typed in Stream Deck.
+   * @returns {object} The title value, or an empty object to leave it alone.
+   */
+  private get feedbackTitleValue(): object {
+    return this.isDynamic ? { value: this.callsign ?? "" } : {};
+  }
+
+  /**
    * Sets the displayed title based on the state of the action.
    */
   private refreshTitle(): void {
@@ -336,6 +345,7 @@ export class StationVolumeController extends BaseController {
       this.action
         .setFeedback({
           title: {
+            ...this.feedbackTitleValue,
             color: "grey",
           },
           indicator: {
@@ -357,6 +367,7 @@ export class StationVolumeController extends BaseController {
     this.action
       .setFeedback({
         title: {
+          ...this.feedbackTitleValue,
           color: this.isOutputMuted ? "#a71d2a" : "#FFFFFF",
         },
         indicator: {

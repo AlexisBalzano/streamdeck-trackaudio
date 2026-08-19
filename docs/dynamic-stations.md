@@ -25,7 +25,9 @@ Normally every station button needs its callsign typed in by hand. With dynamic 
 3. Leave **Callsign** empty. It is ignored while Follow TrackAudio is on.
 4. Connect to voice in TrackAudio and add your stations there.
 
-Your buttons fill in as the stations come up. Buttons with no station yet show a dashed outline.
+Your buttons fill in as the stations come up, each showing its callsign. Buttons with no station yet show a dashed outline.
+
+Dynamic buttons label themselves with the callsign so you can tell them apart. If you would rather use the space for something else, untick **Show callsign** under Advanced options. Volume dials label themselves the same way.
 
 That is the whole setup. Everything below is about layouts with more than one button per station, and what to do when something looks wrong.
 

@@ -12,7 +12,9 @@
       "PropertyInspectorPath": "pi/mainVolume.html",
       "Tooltip": "Controls the main volume for TrackAudio.",
       "SupportURL": "https://projects.neilenns.com/docs/streamdeck-trackaudio/main-volume/",
-      "Controllers": ["Encoder"],
+      "Controllers": [
+        "Encoder"
+      ],
       "Encoder": {
         "layout": "$B1",
         "TriggerDescription": {
@@ -35,7 +37,9 @@
       "PropertyInspectorPath": "pi/stationVolume.html",
       "Tooltip": "Controls the volume for the specified station.",
       "SupportURL": "https://projects.neilenns.com/docs/streamdeck-trackaudio/station-volume/",
-      "Controllers": ["Encoder"],
+      "Controllers": [
+        "Encoder"
+      ],
       "Encoder": {
         "layout": "$B1",
         "TriggerDescription": {
@@ -59,7 +63,9 @@
       "PropertyInspectorPath": "pi/atisLetter.html",
       "Tooltip": "Shows the current ATIS letter for the specified station.",
       "SupportURL": "https://projects.neilenns.com/docs/streamdeck-trackaudio/atis-letter/",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "DisableAutomaticStates": true,
       "UserTitleEnabled": false,
       "States": [
@@ -78,7 +84,9 @@
       "PropertyInspectorPath": "pi/hotline.html",
       "DisableAutomaticStates": true,
       "UserTitleEnabled": false,
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "States": [
         {
           "Image": "images/actions/default",
@@ -95,7 +103,9 @@
       "DisableAutomaticStates": true,
       "UserTitleEnabled": false,
       "PropertyInspectorPath": "pi/pushToTalk.html",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "States": [
         {
           "Image": "images/actions/default",
@@ -110,7 +120,9 @@
       "Tooltip": "Shows the status of a station.",
       "SupportURL": "https://projects.neilenns.com/docs/streamdeck-trackaudio/station-status/",
       "DisableAutomaticStates": true,
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "PropertyInspectorPath": "pi/stationStatus.html",
       "UserTitleEnabled": false,
       "States": [
@@ -129,7 +141,9 @@
       "PropertyInspectorPath": "pi/trackAudioStatus.html",
       "DisableAutomaticStates": true,
       "UserTitleEnabled": false,
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "States": [
         {
           "Image": "images/actions/default",
@@ -139,8 +153,12 @@
     }
   ],
   "ApplicationsToMonitor": {
-    "mac": ["com.vatsim.trackaudio"],
-    "windows": ["trackaudio.exe"]
+    "mac": [
+      "com.vatsim.trackaudio"
+    ],
+    "windows": [
+      "trackaudio.exe"
+    ]
   },
   "Category": "TrackAudio",
   "CategoryIcon": "images/plugin/categoryIcon",

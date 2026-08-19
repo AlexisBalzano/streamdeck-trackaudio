@@ -402,7 +402,9 @@ export class StationStatusController extends BaseController {
    * @returns { boolean } The value. Defaults to false.
    */
   get showCallsign(): boolean {
-    return this.settings.showCallsign ?? false;
+    // Dynamic actions default to on, otherwise there's nothing on the key to say
+    // which station TrackAudio gave it.
+    return this.settings.showCallsign ?? this.isDynamic;
   }
 
   /**
