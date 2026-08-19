@@ -1,5 +1,6 @@
 import { VoiceConnectedState } from "@interfaces/messages";
 import actionManager from "@managers/action";
+import stationRoster from "@managers/stationRoster";
 import trackAudioManager from "@managers/trackAudio";
 import vatsimManager from "@managers/vatsim";
 
@@ -18,6 +19,7 @@ export const handleVoiceConnectedState = async (data: VoiceConnectedState) => {
     // Auto-add all tracked stations
     await actionManager.autoAddStations();
   } else {
+    stationRoster.reset();
     actionManager.resetAllButTrackAudio();
     vatsimManager.stop();
   }

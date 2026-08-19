@@ -74,10 +74,12 @@ class ActionManager extends EventEmitter {
     // Collect all the status action callsigns. Exclude any with isAvailable true as that means it is
     // already added in TrackAudio. Exclude GUARD and UNICOM since those are always
     // automatically present in TrackAudio, and any stations without a callsign.
+    // Dynamic actions are excluded too: they take their callsign from TrackAudio,
+    // so adding it back would change the roster and reassign them in a loop.
     // A Set is used to ensure unique entries in the list.
     const trackedCallsignsSet = new Set(
       this.getStationStatusControllers()
-        .filter((controller) => !controller.isAvailable)
+        .filter((controller) => !controller.isAvailable && !controller.isDynamic)
         .map((controller) => controller.callsign ?? "")
         .filter(
           (callsign) =>

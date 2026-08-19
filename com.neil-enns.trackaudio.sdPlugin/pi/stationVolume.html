@@ -5,6 +5,13 @@
     <script src="https://sdpi-components.dev/releases/v3/sdpi-components.js"></script>
   </head>
   <body>
+    <sdpi-item>
+      <sdpi-checkbox
+        setting="dynamic"
+        label="Follow TrackAudio"
+      ></sdpi-checkbox>
+    </sdpi-item>
+
     <sdpi-item label="Callsign">
       <sdpi-textfield
         setting="callsign"
@@ -60,5 +67,15 @@
         ></sdpi-checkbox>
       </details>
     </sdpi-item>
+
+    <script type="text/javascript">
+      document
+        .querySelector('[setting="dynamic"]')
+        .addEventListener("valuechange", function (ev) {
+          // The callsign comes from TrackAudio when following the station list.
+          document.querySelector('[setting="callsign"]').disabled =
+            ev.target.value;
+        });
+    </script>
   </body>
 </html>

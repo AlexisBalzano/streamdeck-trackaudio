@@ -92,6 +92,8 @@ export interface StationStatusSettings {
   activeCommsImagePath?: string;
   callsign?: string;
   clearAfterInMinutes?: number;
+  dynamic?: boolean;
+  emptySlotImagePath?: string;
   lastReceivedCallsignCount?: number;
   listeningImagePath?: string;
   listenTo: ListenTo | null;

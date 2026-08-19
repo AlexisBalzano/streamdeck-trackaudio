@@ -14,4 +14,6 @@ This Stream Deck plugin provides actions to interact with TrackAudio.
 
 [Read the documentation](https://projects.neilenns.com/docs/streamdeck-trackaudio) for information on how to set up actions and examples of common configurations. Volume control and mute are coming soon!
 
+Tired of typing callsigns into every button? [Dynamic station buttons](docs/dynamic-stations.md) fill themselves from whatever stations you have open in TrackAudio.
+
 Do you use [vATIS](https://vatis.app/) when controlling? Check out the [vATIS actions for Stream Deck plugin](https://github.com/neilenns/streamdeck-vatis).

@@ -1,8 +1,11 @@
 import actionManager from "@managers/action";
+import slotAssigner from "@managers/slotAssigner";
 import vatsimManager from "@managers/vatsim";
 import svgManager from "@managers/svg";
 
 export const handleRemoved = (count: number) => {
+  slotAssigner.assign();
+
   if (count === 0) {
     svgManager.reset();
   }

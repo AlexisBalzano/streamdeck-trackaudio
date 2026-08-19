@@ -5,6 +5,8 @@ import mainLogger from "@utils/logger";
 
 // Managers
 import actionManager from "@managers/action";
+import slotAssigner from "@managers/slotAssigner";
+import stationRoster from "@managers/stationRoster";
 import svgManager from "@managers/svg";
 import trackAudioManager from "@managers/trackAudio";
 import vatsimManager from "@managers/vatsim";
@@ -108,6 +110,10 @@ actionManager.on("atisLetterAdded", handleAtisLetterAdded);
 actionManager.on("atisLetterUpdated", handleAtisLetterUpdated);
 actionManager.on("stationVolumeAdded", handleStationVolumeAdded);
 actionManager.on("mainVolumeAdded", handleMainVolumeAdded);
+
+stationRoster.on("rosterChanged", () => {
+  slotAssigner.assign();
+});
 
 vatsimManager.on("vatsimDataReceived", handleVatsimDataReceived);
 

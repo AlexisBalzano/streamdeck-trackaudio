@@ -1,11 +1,13 @@
 import { StationStatusSettings } from "@actions/stationStatus";
 import { KeyAction } from "@elgato/streamdeck";
 import { Controller } from "@interfaces/controller";
+import { RosterStation } from "@managers/stationRoster";
 import trackAudioManager from "@managers/trackAudio";
 import TitleBuilder from "@root/utils/titleBuilder";
 import { stringOrUndefined } from "@root/utils/utils";
 import { STATION_STATUS_CONTROLLER_TYPE } from "@utils/controllerTypes";
 import mainLogger from "@utils/logger";
+import { buildSlotRole } from "@utils/slotGrouping";
 import debounce from "debounce";
 import { LRUCache } from "lru-cache";
 import { BaseController } from "./baseController";
@@ -26,6 +28,7 @@ const defaultTemplatePath = "images/actions/stationStatus/template.svg";
 export class StationStatusController extends BaseController {
   type = STATION_STATUS_CONTROLLER_TYPE;
 
+  private _assignedStation: RosterStation | undefined = undefined;
   private _frequency = 0;
   private _isAvailable: boolean | undefined = undefined;
   private _isListening = false;
@@ -46,6 +49,7 @@ export class StationStatusController extends BaseController {
   private _listeningImagePath?: string;
   private _notListeningImagePath?: string;
   private _unavailableImagePath?: string;
+  private _emptySlotImagePath?: string;
 
   /**
    * Creates a new StationStatusController object.
@@ -151,6 +155,21 @@ export class StationStatusController extends BaseController {
    */
   set unavailableImagePath(newValue: string | undefined) {
     this._unavailableImagePath = stringOrUndefined(newValue);
+  }
+
+  /**
+   * Gets the path to the empty slot image template.
+   * @returns {string} The path specified by the user, or the defaultTemplatePath if none was specified.
+   */
+  get emptySlotImagePath(): string {
+    return this._emptySlotImagePath ?? defaultTemplatePath;
+  }
+
+  /**
+   * Sets the emptySlotImagePath.
+   */
+  set emptySlotImagePath(newValue: string | undefined) {
+    this._emptySlotImagePath = stringOrUndefined(newValue);
   }
 
   /**
@@ -297,11 +316,53 @@ export class StationStatusController extends BaseController {
   }
 
   /**
-   * Gets the callsign value from settings.
+   * Gets the callsign, either the one assigned by the slot assigner or the one
+   * from settings.
    * @returns {string | undefined} The callsign. Defaults to undefined.
    */
   get callsign(): string | undefined {
-    return this.settings.callsign;
+    return this.isDynamic
+      ? this._assignedStation?.callsign
+      : this.settings.callsign;
+  }
+
+  /**
+   * Gets the dynamic value from settings.
+   * @returns {boolean} True if the action follows the TrackAudio station list. Defaults to false.
+   */
+  get isDynamic(): boolean {
+    return this.settings.dynamic ?? false;
+  }
+
+  /**
+   * Gets the station assigned by the slot assigner.
+   * @returns {RosterStation | undefined} The station. Defaults to undefined.
+   */
+  get assignedStation(): RosterStation | undefined {
+    return this._assignedStation;
+  }
+
+  /**
+   * Sets the station assigned by the slot assigner and clears any state left
+   * over from the station that was there before.
+   */
+  set assignedStation(newValue: RosterStation | undefined) {
+    this._assignedStation = newValue;
+    this._lastReceivedCallsign = undefined;
+    this._isListening = false;
+    this._isReceiving = false;
+    this._isTransmitting = false;
+    this._isOutputMuted = undefined;
+
+    this.frequency = newValue?.frequency ?? 0;
+  }
+
+  /**
+   * Gets the role used to decide which neighbouring slots share this station.
+   * @returns {string} The role
+   */
+  get slotRole(): string {
+    return buildSlotRole(this.listenTo, this.showLastReceivedCallsign);
   }
 
   /**
@@ -392,8 +453,14 @@ export class StationStatusController extends BaseController {
    * Sets the settings.
    */
   set settings(newValue: StationStatusSettings) {
-    // Issue 183: Clear the frequency if the callsign changes.
-    if (this._settings && this._settings.callsign !== newValue.callsign) {
+    // Issue 183: Clear the frequency if the callsign changes. Switching in or
+    // out of dynamic mode changes which callsign applies, so clear then too.
+    if (
+      this._settings &&
+      (this._settings.callsign !== newValue.callsign ||
+        this._settings.dynamic !== newValue.dynamic)
+    ) {
+      this._assignedStation = undefined;
       this.frequency = 0;
     }
 
@@ -423,6 +490,7 @@ export class StationStatusController extends BaseController {
     this.listeningImagePath = newValue.listeningImagePath;
     this.notListeningImagePath = newValue.notListeningImagePath;
     this.unavailableImagePath = newValue.unavailableImagePath;
+    this.emptySlotImagePath = newValue.emptySlotImagePath;
 
     this.refreshDisplay();
   }
@@ -623,6 +691,7 @@ export class StationStatusController extends BaseController {
    * Resets the action to its default state.
    */
   public reset() {
+    this._assignedStation = undefined;
     this._lastReceivedCallsign = undefined; // This also clears _lastReceivedCallsignHistory
     this._frequency = 0;
     this._isListening = false;
@@ -672,6 +741,16 @@ export class StationStatusController extends BaseController {
       isOutputMuted: this.isOutputMuted,
       outputVolume: this.outputVolume,
     };
+
+    // A dynamic action with no station is waiting for one, which is a different
+    // thing to a configured station TrackAudio doesn't have.
+    if (this.isDynamic && !this.callsign) {
+      this.setImage(this.emptySlotImagePath, {
+        ...replacements,
+        state: "empty",
+      });
+      return;
+    }
 
     if (trackAudioManager.isVoiceConnected && !this.isAvailable) {
       this.setImage(this.unavailableImagePath, {

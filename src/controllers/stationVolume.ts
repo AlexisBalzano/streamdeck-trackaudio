@@ -1,6 +1,7 @@
 import { StationVolumeSettings } from "@actions/stationVolume";
 import { DialAction } from "@elgato/streamdeck";
 import { Controller } from "@interfaces/controller";
+import { RosterStation } from "@managers/stationRoster";
 import trackAudioManager from "@managers/trackAudio";
 import { STATION_VOLUME_CONTROLLER_TYPE } from "@utils/controllerTypes";
 import { handleAsyncException } from "@utils/handleAsyncException";
@@ -15,6 +16,7 @@ export class StationVolumeController extends BaseController {
 
   declare action: DialAction; // This ensures action from the base class is always a DialAction
 
+  private _assignedStation: RosterStation | undefined = undefined;
   private _frequency = 0;
   private _isAvailable: boolean | undefined = undefined;
   private _isOutputMuted? = false;
@@ -49,6 +51,7 @@ export class StationVolumeController extends BaseController {
    * Resets the action to its default state.
    */
   override reset(): void {
+    this._assignedStation = undefined;
     this._isAvailable = undefined;
     this._isOutputMuted = false;
     this._frequency = 0;
@@ -177,8 +180,14 @@ export class StationVolumeController extends BaseController {
    * Sets the settings.
    */
   set settings(newValue: StationVolumeSettings) {
-    // Clear the frequency if the callsign changes.
-    if (this._settings && this._settings.callsign !== newValue.callsign) {
+    // Clear the frequency if the callsign changes, or if the action switches in
+    // or out of dynamic mode and a different callsign now applies.
+    if (
+      this._settings &&
+      (this._settings.callsign !== newValue.callsign ||
+        this._settings.dynamic !== newValue.dynamic)
+    ) {
+      this._assignedStation = undefined;
       this.frequency = 0;
     }
 
@@ -191,11 +200,42 @@ export class StationVolumeController extends BaseController {
   }
 
   /**
-   * Gets the callsign value from settings.
+   * Gets the callsign, either the one assigned by the slot assigner or the one
+   * from settings.
    * @returns {string | undefined} The callsign. Defaults to undefined.
    */
   get callsign(): string | undefined {
-    return this.settings.callsign;
+    return this.isDynamic
+      ? this._assignedStation?.callsign
+      : this.settings.callsign;
+  }
+
+  /**
+   * Gets the dynamic value from settings.
+   * @returns {boolean} True if the action follows the TrackAudio station list. Defaults to false.
+   */
+  get isDynamic(): boolean {
+    return this.settings.dynamic ?? false;
+  }
+
+  /**
+   * Gets the station assigned by the slot assigner.
+   * @returns {RosterStation | undefined} The station. Defaults to undefined.
+   */
+  get assignedStation(): RosterStation | undefined {
+    return this._assignedStation;
+  }
+
+  /**
+   * Sets the station assigned by the slot assigner and clears any state left
+   * over from the station that was there before.
+   */
+  set assignedStation(newValue: RosterStation | undefined) {
+    this._assignedStation = newValue;
+    this._isOutputMuted = false;
+    this._outputVolume = 100;
+
+    this.frequency = newValue?.frequency ?? 0;
   }
 
   /**

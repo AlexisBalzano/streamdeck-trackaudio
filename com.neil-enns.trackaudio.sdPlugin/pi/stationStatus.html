@@ -13,6 +13,13 @@
       ></sdpi-textarea>
     </sdpi-item>
 
+    <sdpi-item>
+      <sdpi-checkbox
+        setting="dynamic"
+        label="Follow TrackAudio"
+      ></sdpi-checkbox>
+    </sdpi-item>
+
     <sdpi-item label="Callsign">
       <sdpi-textfield
         setting="callsign"
@@ -110,6 +117,13 @@
       ></sdpi-file>
     </sdpi-item>
 
+    <sdpi-item label="Empty slot">
+      <sdpi-file
+        setting="emptySlotImagePath"
+        accept="image/png, image/jpeg, image/svg+xml"
+      ></sdpi-file>
+    </sdpi-item>
+
     <sdpi-item>
       <details class="sdpi-item-value">
         <summary>Advanced options</summary>
@@ -159,6 +173,16 @@
         </sdpi-item>
       </details>
     </sdpi-item>
+
+    <script type="text/javascript">
+      document
+        .querySelector('[setting="dynamic"]')
+        .addEventListener("valuechange", function (ev) {
+          // The callsign comes from TrackAudio when following the station list.
+          document.querySelector('[setting="callsign"]').disabled =
+            ev.target.value;
+        });
+    </script>
 
     <script type="text/javascript">
       document

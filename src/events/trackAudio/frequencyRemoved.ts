@@ -1,5 +1,6 @@
 import { FrequencyRemoved } from "@interfaces/messages";
 import actionManager from "@managers/action";
+import stationRoster from "@managers/stationRoster";
 
 /**
  * Removes the frequency from all actions that depend on it.
@@ -7,6 +8,8 @@ import actionManager from "@managers/action";
  */
 export const handleFrequencyRemoved = (data: FrequencyRemoved) => {
   const { frequency } = data.value;
+
+  stationRoster.removeByFrequency(frequency);
 
   actionManager
     .getStationStatusControllers()

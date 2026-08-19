@@ -94,6 +94,7 @@ export interface StationVolumeSettings {
   unavailableImagePath?: string;
   callsign?: string;
   changeAmount?: number;
+  dynamic?: boolean;
   mutedImagePath?: string;
   notMutedImagePath?: string;
   pushToMute?: boolean;
